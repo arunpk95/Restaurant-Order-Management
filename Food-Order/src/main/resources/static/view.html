@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Reports</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+    <style>
+        table {
+            font-family: arial, sans-serif;
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        td,
+        th {
+            border: 1px solid #dddddd;
+            text-align: left;
+            padding: 8px;
+        }
+
+        th {
+            background-color: grey;
+        }
+
+        tr:nth-child(even) {
+            background-color: #dddddd;
+        }
+    </style>
+
+
+    <script>
+        function getReport() {
+
+            //$('#exampleModal').modal('show');
+            var xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function () {
+                if (this.readyState == 4 && this.status == 200) {
+                    //response action
+                    var mani ="";
+                    var datas = JSON.parse(this.responseText);
+                    
+                    for(data of datas)
+                    {
+                        mani = mani + '<tr><td>' + data.orderId + '</td><td>' + data.customerName + '</td><td>' + data.paymentAmount +
+                         '</td><td>' + data.labourName + '</td><td>' + data.orderStatus + '</td><td>' + data.createDate + '</td></tr>';
+                    }
+                    document.getElementById('conf_order').innerHTML = mani;
+
+                }
+            };
+            xhttp.open("GET", "http://localhost:8080/getReport?fromDate=" + $('#from').val() + "&toDate=" + $('#to').val(), true);
+            xhttp.send();
+        }
+    </script>
+
+</head>
+
+<body>
+    <center>
+        <h1>View Report</h1>
+
+        <div class="form-group">
+            <label for="email">From Date</label>
+            <input type="email" style="width: 150px;" class="form-control" placeholder="yyyy-mm-dd" id="from">
+        </div>
+        <div class="form-group">
+            <label for="email">To Date:</label>
+            <input type="email" class="form-control" style="width: 150px;" placeholder="yyyy-mm-dd" id="to">
+        </div>
+        <button type="button" onclick="getReport()" class="btn btn-success">Show Report</button>
+
+        <table>
+                    <tr>
+                        <th>Order Id:</th>
+                        <th>Customer Name:</th>
+                        <th>Amount:</th>
+                        <th>Labour:</th>
+                        <th>Order Status:</th>
+                        <th>Timestamp:</th>
+                    </tr>
+                    <tbody id="conf_order">
+
+                    </tbody>
+                </table>
+    </center>
+
+
+
+
+</body>
+
+</html>

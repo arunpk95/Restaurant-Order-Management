@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>Welcome</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+
+  <script>
+    function verify() {
+
+      //hide if err is already shown
+      document.getElementById('phoneErr').style.display = 'none';
+
+      //if valid phone num
+      if ($('#phone').val().length > 3) {
+        var xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function () {
+          if (this.readyState == 4 && this.status == 200) {
+            //if customer exists
+            if (this.responseText != '') {
+            var customerId = JSON.parse(this.responseText).customerId;
+            login(customerId);
+            }
+            else {
+              $('#exampleModal').modal('show');
+            }
+
+          }
+        };
+        xhttp.open("GET", "http://localhost:8080/getCustomer?phoneNumber=" + $('#phone').val(), true);
+        xhttp.send();
+      }
+      else {
+        document.getElementById('phoneErr').style.display = 'block';
+      }
+
+    }
+
+    function addCustomer() {
+      var customer = {
+            "customerName": $('#name').val(),
+            "customerPhoneNumber": $('#phone').val(),
+            "customerEmail": $('#email').val()
+          }
+      var xhttp = new XMLHttpRequest();
+      xhttp.onreadystatechange = function () {
+        if (this.readyState == 4 && this.status == 200) {
+          
+          var customerId = JSON.parse(this.responseText).customerId;
+            
+          //if customer exists
+          if (this.responseText != 'false') {
+            verify();
+          }
+        }
+      };
+      xhttp.open("POST", "http://localhost:8080/saveCustomer", true);
+      xhttp.setRequestHeader("Content-type", "application/json");
+      xhttp.send(JSON.stringify(customer));
+    }
+
+    function login(custId) {
+      if ($('#phone').val().length > 0) {
+        console.log('in');
+        localStorage.setItem("cust", custId);
+        console.log('cid fp' + custId);
+        window.location.href = "items.html";
+      }
+
+    }
+  </script>
+</head>
+
+<body>
+
+  <div class="container" style="margin-top:30px">
+    <center>
+      <h2>Welcome! Enter Phone number to continue</h2>
+      <form style="margin-top:50px;width:50%">
+        <div class="form-group">
+          <input type="text" class="form-control" id="phone" placeholder="Enter Phone Number" name="phone" required>
+          <div style="display:none" id="phoneErr" class="invalid-feedback">Valid Phone number required</div>
+        </div>
+      </form>
+      <button onclick="verify()" class="btn btn-success">Continue</button>
+    </center>
+
+    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+      aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">New Customer:</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <form>
+              <div class="form-group">
+                <label for="recipient-name" class="col-form-label">Name:</label>
+                <input type="text" class="form-control" id="name" name="name" required>
+              </div>
+              <div class="form-group">
+                <label for="message-text" class="col-form-label">Email:</label>
+                <input type="text" class="form-control" id="email" name="email">
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="button" onclick="addCustomer()" class="btn btn-success">Continue</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</body>
+
+</html>

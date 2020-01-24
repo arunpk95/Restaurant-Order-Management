@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Bootstrap Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+    <style>
+        table {
+            font-family: arial, sans-serif;
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        td,
+        th {
+            border: 1px solid #dddddd;
+            text-align: left;
+            padding: 8px;
+        }
+        th
+        {
+            background-color: grey;
+        }
+
+        tr:nth-child(even) {
+            background-color: #dddddd;
+        }
+    </style>
+
+    <script>
+        var man_conf="",man_ip="",man_pickup="";
+        function getOrders() {
+            var xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function () {
+                if (this.readyState == 4 && this.status == 200) {
+                    //response action
+                    
+                    var orders = JSON.parse(this.responseText);
+
+                    for (order of orders) {
+                        if(order.orderStatus=="ORDER_CONFIRMED")
+                        {
+                            man_conf = man_conf + '<tr><td>'+order.orderId+'</td></tr>';
+                        }
+                        else if(order.orderStatus=="PREPARING_ORDER")
+                        {
+                            man_ip = man_ip + '<tr><td>'+order.orderId+'</td></tr>';
+                        }
+                        else if(order.orderStatus == "ORDER_COMPLETED")
+                        {
+                            man_pickup = man_pickup + '<tr><td>'+order.orderId+'</td></tr>';
+                        }
+                    }
+                    console.log(man_conf);
+                    document.getElementById('conf_order').innerHTML = man_conf;
+                    document.getElementById('ip_order').innerHTML = man_ip;
+                    document.getElementById('pickup_order').innerHTML = man_pickup;
+
+
+                }
+            };
+            xhttp.open("GET", "http://localhost:8080/getOrders", true);
+            xhttp.send();
+        }
+    </script>
+
+</head>
+
+<body onload="getOrders()">
+    <div class="container">
+        <h1>Order Status</h1>
+        <div class="row">
+            <div class="col">
+                <table>
+                    <tr><th>Confirmed Orders</th></tr>
+                    <tbody id="conf_order">
+                        
+                    </tbody>
+                </table>
+            </div>
+            <div class="col">
+                <table>
+                    <tr>
+                        <th>In Progress</th>
+                    </tr>
+                    <tbody id="ip_order">
+                        
+                    </tbody>
+                </table>
+            </div>
+            <div class="col">
+                <table>
+                    <tr>
+                        <th>Ready for Pick-up</th>
+                    </tr>
+                    <tbody id="pickup_order">
+                        
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
